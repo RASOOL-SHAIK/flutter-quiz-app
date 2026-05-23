@@ -9,14 +9,17 @@
 ### 🏠 Home / Splash Screen
 <img width="1917" height="967" alt="Screenshot 2026-05-23 200607" src="https://github.com/user-attachments/assets/0be37711-f4d8-4441-9210-1f183e80043a" /> 
 
+
 ### ❓ Quiz Screen
 <img width="1917" height="961" alt="image" src="https://github.com/user-attachments/assets/ece7e436-a53d-43a8-98d3-c8ee411b9aab" />
+
 
 ### 🏆 Result Screen
 <img width="1912" height="964" alt="image" src="https://github.com/user-attachments/assets/8c945628-61b5-4bfe-8fae-22b88f6f50de" />
 
 ### 📊 Leaderboard Screen
 <img width="1918" height="962" alt="image" src="https://github.com/user-attachments/assets/36e2bfbe-7689-48fe-b009-5661b1868237" />
+
 
 ### ⚙️ Settings Screen
 <img width="1919" height="932" alt="image" src="https://github.com/user-attachments/assets/94ddb211-1167-40c4-be76-c91a63db5ebe" />
