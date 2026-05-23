@@ -1,0 +1,30 @@
+name: quiz_app
+description: A Flutter quiz app with leaderboard, timer, and sound effects.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  audioplayers: ^5.2.1
+  url_launcher: ^6.2.5
+  path_provider: ^2.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/questions.json
+    # Uncomment below when you add real .mp3 files to assets/sounds/
+    - assets/sounds/correct.ogg
+    - assets/sounds/wrong.ogg
