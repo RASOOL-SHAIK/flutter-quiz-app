@@ -1,5 +1,5 @@
 [
-  {"question": "What is the capital of France?", "answers": ["Paris", "London", "Berlin", "Madrid"], "correct_answer": "Paris"},
+  {"question": "What is the capital of France?", "answers": ["Paris", "London", "Berlin", "Madrid"], "correct_answer": "Paris"}, 
   {"question": "Which planet is known as the Red Planet?", "answers": ["Earth", "Mars", "Jupiter", "Venus"], "correct_answer": "Mars"},
   {"question": "What is the largest ocean on Earth?", "answers": ["Atlantic", "Indian", "Arctic", "Pacific"], "correct_answer": "Pacific"},
   {"question": "Who wrote 'Romeo and Juliet'?", "answers": ["Dickens", "Shakespeare", "Austen", "Orwell"], "correct_answer": "Shakespeare"},
