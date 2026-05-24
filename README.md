@@ -11,7 +11,7 @@
 
 
 ### ❓ Quiz Screen
-<img width="1917" height="961" alt="image" src="https://github.com/user-attachments/assets/ece7e436-a53d-43a8-98d3-c8ee411b9aab" />
+<img width="1918" height="964" alt="image" src="https://github.com/user-attachments/assets/9a7e140a-b35e-4d4c-9f32-58c480c82862" />
 
 
 ### 🏆 Result Screen
