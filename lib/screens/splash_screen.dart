@@ -12,9 +12,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const QuizScreen()));
+    Future.delayed(const Duration(seconds: 4), () {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const QuizScreen()));
     });
   }
 
@@ -37,22 +36,17 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Quiz Challenge',
-                style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 10),
               Text(
-                'Presented by Aapthi Technologies',
-                style: TextStyle(
-                    fontSize: 16, color: Colors.white.withOpacity(0.9)),
+                'Powered by Aapthi Technologies',
+                style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.9)),
               ),
               const SizedBox(height: 6),
               Text(
                 'Designed by Rasool Shaik',
-                style: TextStyle(
-                    fontSize: 14, color: Colors.white.withOpacity(0.7)),
+                style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.7)),
               ),
               const SizedBox(height: 30),
               const CircularProgressIndicator(color: Colors.white),

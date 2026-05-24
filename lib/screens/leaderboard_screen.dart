@@ -26,8 +26,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Leaderboard',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Leaderboard', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 0,
       ),
@@ -46,8 +45,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   children: [
                     Icon(Icons.leaderboard, size: 80, color: Colors.grey),
                     SizedBox(height: 16),
-                    Text('No scores yet',
-                        style: TextStyle(fontSize: 18, color: Colors.grey)),
+                    Text('No scores yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
                   ],
                 ),
               )
@@ -68,33 +66,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   return Card(
                     elevation: 4,
                     margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: rankColor,
-                        child: Text('$rank',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
+                        child: Text('$rank', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                       title: Text(
                         _scores[i]['name'],
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                         textAlign: TextAlign.center,
                       ),
                       trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade100,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           '${_scores[i]['score']} pts',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ),
                     ),

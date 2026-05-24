@@ -54,8 +54,7 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       _isAnswered = true;
       _selectedAnswerIndex = selectedIdx;
-      final isCorrect = _roundQuestions[_currentIndex].answers[selectedIdx] ==
-          _roundQuestions[_currentIndex].correctAnswer;
+      final isCorrect = _roundQuestions[_currentIndex].answers[selectedIdx] == _roundQuestions[_currentIndex].correctAnswer;
       if (isCorrect) {
         _score++;
         SoundService.playCorrect();
@@ -71,17 +70,23 @@ class _QuizScreenState extends State<QuizScreen> {
     if (_currentIndex + 1 < _roundQuestions.length) {
       setState(() {
         _currentIndex++;
-        _selectedAnswerIndex = null;
-        _isAnswered = false;
-        _startTimer();
+        _selectedAnswerIndex = null; // reset selected answer
+        _isAnswered = false; // reset answered state
+        _startTimer(); // again restart timer for next question
       });
     } else {
-      _timer?.cancel();
+      // quiz end
+      _timer?.cancel(); // stop timer if still running
       Navigator.pushReplacement(
+          // navigate to result screen and pass score & push replacement means user can't go back to quiz screen
           context,
           MaterialPageRoute(
-              builder: (_) =>
-                  ResultScreen(score: _score, total: _roundQuestions.length)));
+              // materialpageroute means ? what ? it is used to navigate to another screen with material design transition
+              // why builder ? what is builder ? simply it is a function that returns a widget and it is used to build the widget tree for the new screen
+              builder: (_) => ResultScreen(
+                  // result screen is a stateless widget that shows the final score and some message based on the score
+                  score: _score,
+                  total: _roundQuestions.length)));
     }
   }
 
@@ -106,8 +111,7 @@ class _QuizScreenState extends State<QuizScreen> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const SettingsScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
             },
           ),
         ],
@@ -143,9 +147,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       child: LinearProgressIndicator(
                         value: timerProgress,
                         backgroundColor: Colors.grey.shade300,
-                        color: timerProgress > 0.3
-                            ? Colors.amber.shade700
-                            : Colors.deepOrange,
+                        color: timerProgress > 0.3 ? Colors.amber.shade700 : Colors.deepOrange,
                         borderRadius: BorderRadius.circular(8),
                         minHeight: 8,
                       ),
@@ -153,9 +155,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     const SizedBox(width: 8),
                     Text(
                       '$_timeLeft sec',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepOrange),
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange),
                     ),
                   ],
                 ),
@@ -163,8 +163,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 // Question text
                 Text(
                   q.text,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
@@ -175,13 +174,9 @@ class _QuizScreenState extends State<QuizScreen> {
                   Color textColor = Colors.black87;
                   if (_isAnswered && idx == _selectedAnswerIndex) {
                     final isUserCorrect = q.answers[idx] == q.correctAnswer;
-                    cardColor = isUserCorrect
-                        ? Colors.green.shade50
-                        : Colors.red.shade50;
+                    cardColor = isUserCorrect ? Colors.green.shade50 : Colors.red.shade50;
                     borderColor = isUserCorrect ? Colors.green : Colors.red;
-                    textColor = isUserCorrect
-                        ? Colors.green.shade800
-                        : Colors.red.shade800;
+                    textColor = isUserCorrect ? Colors.green.shade800 : Colors.red.shade800;
                   } else if (_isAnswered && q.answers[idx] == q.correctAnswer) {
                     cardColor = Colors.green.shade50;
                     borderColor = Colors.green;
@@ -204,16 +199,8 @@ class _QuizScreenState extends State<QuizScreen> {
                           child: ListTile(
                             leading: _isAnswered
                                 ? Icon(
-                                    q.answers[idx] == q.correctAnswer
-                                        ? Icons.check_circle
-                                        : (idx == _selectedAnswerIndex
-                                            ? Icons.cancel
-                                            : Icons.radio_button_unchecked),
-                                    color: q.answers[idx] == q.correctAnswer
-                                        ? Colors.green
-                                        : (idx == _selectedAnswerIndex
-                                            ? Colors.red
-                                            : Colors.grey),
+                                    q.answers[idx] == q.correctAnswer ? Icons.check_circle : (idx == _selectedAnswerIndex ? Icons.cancel : Icons.radio_button_unchecked),
+                                    color: q.answers[idx] == q.correctAnswer ? Colors.green : (idx == _selectedAnswerIndex ? Colors.red : Colors.grey),
                                   )
                                 : Radio<int>(
                                     value: idx,
@@ -223,10 +210,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                   ),
                             title: Text(
                               q.answers[idx],
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: textColor),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor),
                             ),
                           ),
                         ),
@@ -240,8 +224,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   onPressed: _isAnswered ? _nextQuestion : null,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
-                    backgroundColor:
-                        _isAnswered ? Colors.teal : Colors.grey.shade400,
+                    backgroundColor: _isAnswered ? Colors.teal : Colors.grey.shade400,
                     foregroundColor: Colors.white,
                     elevation: 6,
                   ),
