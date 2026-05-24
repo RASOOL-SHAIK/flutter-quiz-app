@@ -28,12 +28,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Privacy Policy'),
-        content: const Text(
-            'We do not collect any personal data. Your scores are stored locally.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('OK'))
-        ],
+        content: const Text('We do not collect any personal data. Your scores are stored locally.'),
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
       ),
     );
   }
@@ -44,8 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _rateApp() {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Rate our app!')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rate our app!')));
   }
 
   @override

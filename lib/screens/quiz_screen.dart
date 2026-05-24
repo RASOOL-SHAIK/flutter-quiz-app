@@ -25,14 +25,14 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    _loadQuestions();
+    _loadQuestions(); // calls the function to load questions from the quiz data service and starts the quiz
   }
 
   Future<void> _loadQuestions() async {
     final all = await QuizDataService.loadQuestions();
     setState(() {
-      _roundQuestions = QuizDataService.getRandomQuestions(all, 10);
-      _startTimer();
+      _roundQuestions = QuizDataService.getRandomQuestions(all, 10); // gets 10 random questions from the loaded questions and sets it to the state variable _roundQuestions
+      _startTimer(); // starts the timer for the first question
     });
   }
 
@@ -40,6 +40,7 @@ class _QuizScreenState extends State<QuizScreen> {
     _timer?.cancel();
     _timeLeft = 30;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      // starts a periodic timer that ticks every second and updates the time left for the current question
       if (_timeLeft <= 1) {
         timer.cancel();
         if (!_isAnswered) _nextQuestion(autoTimeOut: true);
@@ -50,26 +51,31 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _checkAnswer(int selectedIdx) {
+    // checks the selected answer index against the correct answer for the current question and updates the score and state accordingly
     if (_isAnswered) return;
     setState(() {
       _isAnswered = true;
       _selectedAnswerIndex = selectedIdx;
       final isCorrect = _roundQuestions[_currentIndex].answers[selectedIdx] == _roundQuestions[_currentIndex].correctAnswer;
       if (isCorrect) {
-        _score++;
-        SoundService.playCorrect();
+        _score++; // increment score if the answer is correct
+        SoundService.playCorrect(); // play correct sound if the answer is correct
       } else {
+        // play wrong sound if the answer is incorrect
         SoundService.playWrong();
       }
-      _timer?.cancel();
-      Future.delayed(const Duration(milliseconds: 800), () => _nextQuestion());
+      _timer?.cancel(); // stop the timer when the user has answered
+      Future.delayed(const Duration(milliseconds: 800), () => _nextQuestion()); // wait for 800 milliseconds before moving to the next question to show the correct/wrong feedback
     });
   }
 
   void _nextQuestion({bool autoTimeOut = false}) {
+    // moves to the next question or ends the quiz if it was the last question, also handles the case when time runs out for a question
     if (_currentIndex + 1 < _roundQuestions.length) {
+      // if there are more questions left, move to the next question
       setState(() {
-        _currentIndex++;
+        // update the state to move to the next question
+        _currentIndex++; // increment the current index to move to the next question
         _selectedAnswerIndex = null; // reset selected answer
         _isAnswered = false; // reset answered state
         _startTimer(); // again restart timer for next question
@@ -87,6 +93,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   // result screen is a stateless widget that shows the final score and some message based on the score
                   score: _score,
                   total: _roundQuestions.length)));
+      // this line - redirects to ResultScreen in lib/screens/result_screen.dart and passes the score and total number of questions as arguments to the result screen to show the final score and message based on the score
     }
   }
 

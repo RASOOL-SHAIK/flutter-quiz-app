@@ -4,10 +4,11 @@ import 'screens/splash_screen.dart';
 import 'services/hive_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  await HiveService.init();
-  runApp(const QuizApp());
+  // this line - entry point of the app, initializes Hive and runs the app
+  WidgetsFlutterBinding.ensureInitialized(); // ensures Flutter bindings are initialized before any async operations
+  await Hive.initFlutter(); // initializes Hive for Flutter
+  await HiveService.init(); // initializes the HiveService which opens the scores box -> this line- redirects to HiveService.init() in lib/services/hive_service.dart
+  runApp(const QuizApp()); // calls quiz app which is the root widget of the app
 }
 
 class QuizApp extends StatelessWidget {
@@ -38,13 +39,12 @@ class QuizApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
-            textStyle:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+      home: const SplashScreen(), // calls the splash screen which is the first screen of the app -> this line - redirects to SplashScreen in lib/screens/splash_screen.dart
     );
   }
 }

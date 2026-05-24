@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../services/hive_service.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({super.key});
+  const LeaderboardScreen({super.key}); // this line - defines the constructor for the LeaderboardScreen widget, which is a StatefulWidget that displays the leaderboard of top scores saved in Hive.
 
   @override
-  State<LeaderboardScreen> createState() => _LeaderboardScreenState();
+  State<LeaderboardScreen> createState() => _LeaderboardScreenState(); // this line - creates the mutable state for the LeaderboardScreen widget by returning an instance of _LeaderboardScreenState, which is defined below and contains the logic for loading and displaying the scores from Hive.
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
@@ -18,8 +18,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Future<void> _loadScores() async {
-    final scores = await HiveService.getTopScores();
-    setState(() => _scores = scores);
+    // this method - loads the top scores from Hive using the HiveService and updates the state to display them in the UI
+    final scores = await HiveService.getTopScores(); // retrieves the top scores from Hive using the getTopScores method from HiveService, which returns a list of maps containing the name and score of each entry
+    setState(() => _scores = scores); // updates the state of the widget by setting the _scores variable to the list of scores retrieved from Hive, which triggers a rebuild of the UI to display the updated leaderboard
   }
 
   @override

@@ -11,9 +11,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    super.initState();
+    // called when the splash screen is first created, used to perform initialization tasks
+    super.initState(); // calls the parent class's initState
     Future.delayed(const Duration(seconds: 4), () {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const QuizScreen()));
+      // waits for 4 seconds before executing the function
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const QuizScreen())); // calls quiz screen and replaces the splash screen in the navigation stack
     });
   }
 

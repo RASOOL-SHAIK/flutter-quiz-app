@@ -4,7 +4,8 @@ class HiveService {
   static late Box _scoresBox;
 
   static Future<void> init() async {
-    _scoresBox = await Hive.openBox('scores');
+    _scoresBox = await Hive.openBox('scores'); // creates/opens a box named 'scores' and assigns it to the static variable _scoresBox &
+    // and then returns back to main.dart after initialization is complete
   }
 
   static Future<void> addScore(String name, int score) async {
@@ -12,12 +13,8 @@ class HiveService {
     await _scoresBox.put(id, {'name': name, 'score': score});
   }
 
-  static Future<List<Map<String, dynamic>>> getTopScores(
-      {int limit = 10}) async {
-    final list = _scoresBox.values
-        .cast<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
+  static Future<List<Map<String, dynamic>>> getTopScores({int limit = 10}) async {
+    final list = _scoresBox.values.cast<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
     list.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
     return list.take(limit).toList();
   }
