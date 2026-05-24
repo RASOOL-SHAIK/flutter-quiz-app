@@ -1,6 +1,6 @@
 # Flutter Quiz Application
 
-🌐 Hosted Link: https://flutter-quiz-application.netlify.app/ (Tap here for quick review)
+🌐 Hosted Link: [https://flutter-quiz-application.netlify.app/](https://flutter-quiz-application.netlify.app/) (Tap here for quick review)
 
 ✨ Flutter Quiz Application: A responsive Flutter-based quiz application built using Dart and Flutter, featuring timed quiz questions, leaderboard tracking, settings customization, sound effects, and local score persistence for an engaging quiz experience.
 
