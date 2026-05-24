@@ -7,7 +7,7 @@
 ## 📸 Screenshots 
  
 ### 🏠 Home / Splash Screen
-<img width="1917" height="967" alt="Screenshot 2026-05-23 200607" src="https://github.com/user-attachments/assets/0be37711-f4d8-4441-9210-1f183e80043a" /> 
+<img width="1904" height="902" alt="image" src="https://github.com/user-attachments/assets/fbb2acd9-d66e-4071-a2db-2a44d29d3c67" />
 
 
 ### ❓ Quiz Screen
