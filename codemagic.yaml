@@ -1,0 +1,7 @@
+workflows:
+  default:
+    name: Default Workflow
+    scripts:
+      - flutter build apk --debug
+    artifacts:
+      - build/**/outputs/flutter-apk/*.apk
