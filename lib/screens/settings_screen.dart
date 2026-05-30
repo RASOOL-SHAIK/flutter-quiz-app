@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../constants.dart';
 import '../services/sound_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -19,7 +19,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _toggleSound(bool val) {
-    setState(() => _soundEnabled = val);
+    setState(() {
+      _soundEnabled = val;
+    });
     SoundService.setEnabled(val);
   }
 
@@ -27,43 +29,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Privacy Policy'),
-        content: const Text('We do not collect any personal data. Your scores are stored locally.'),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        title: Text(AppConstants.privacyPolicy),
+        content: Text(AppConstants.privacyPolicyText),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _launchTerms() async {
-    const url = 'https://example.com/terms';
-    if (await canLaunchUrl(Uri.parse(url))) await launchUrl(Uri.parse(url));
-  }
+  // Temporarily removed Terms & Conditions (needs url_launcher)
+  // You can add it back later after fixing the package.
 
   void _rateApp() {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rate our app!')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Rate our app!')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: Text(AppConstants.settingsTitle),
+        centerTitle: true,
+      ),
       body: ListView(
         children: [
           SwitchListTile(
-            title: const Text('Sound Effects'),
+            title: Text(AppConstants.soundEffects),
             value: _soundEnabled,
             onChanged: _toggleSound,
+            activeColor: theme.primaryColor,
           ),
           ListTile(
-            title: const Text('Privacy Policy'),
+            title: Text(AppConstants.privacyPolicy),
             onTap: _showPrivacyDialog,
           ),
+          // Terms & Conditions button removed temporarily
           ListTile(
-            title: const Text('Terms & Conditions'),
-            onTap: _launchTerms,
-          ),
-          ListTile(
-            title: const Text('Rate App'),
+            title: Text(AppConstants.rateApp),
             onTap: _rateApp,
           ),
         ],

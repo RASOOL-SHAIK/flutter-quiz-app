@@ -5,7 +5,7 @@ version: 1.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
- 
+
 dependencies:
   flutter:
     sdk: flutter
@@ -13,7 +13,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   audioplayers: ^5.2.1
-  url_launcher: ^6.2.5
+  # url_launcher: ^6.2.5
   path_provider: ^2.1.1
 
 dev_dependencies:
@@ -25,6 +25,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/questions.json
-    # Uncomment below when you add real .mp3 files to assets/sounds/
     - assets/sounds/correct.ogg
     - assets/sounds/wrong.ogg

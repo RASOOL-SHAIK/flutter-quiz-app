@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants.dart';
 import 'leaderboard_screen.dart';
 import '../services/hive_service.dart';
 import 'quiz_screen.dart';
@@ -6,101 +7,147 @@ import 'quiz_screen.dart';
 class ResultScreen extends StatelessWidget {
   final int score;
   final int total;
-  const ResultScreen({super.key, required this.score, required this.total});
+  final int attemptedCount;
+
+  const ResultScreen({
+    super.key,
+    required this.score,
+    required this.total,
+    required this.attemptedCount,
+  });
 
   Future<void> _saveAndShowLeaderboard(BuildContext context) async {
-    // shows a dialog to enter the user's name and saves the score to Hive, then navigates to the leaderboard screen
-    final TextEditingController controller = TextEditingController();
-    final String? name = await showDialog<String>(
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Save Your Score'), // title of the dialog that prompts the user to save their score
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
+        title: Text(AppConstants.saveYourScore),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Enter your name', // hint text for the text field where the user enters their name
-            border: OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(hintText: AppConstants.enterNameHint),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, null), // closes the dialog without saving the score if the user presses the cancel button
-            child: const Text('CANCEL'), // label for the cancel button in the dialog
+            onPressed: () => Navigator.pop(ctx, null),
+            child: Text(AppConstants.cancel),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, controller.text.trim()), // closes the dialog and returns the trimmed text from the controller as the user's name if they press the save button
-            child: const Text('SAVE'), // label for the save button in the dialog
+            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            child: Text(AppConstants.save),
           ),
         ],
       ),
     );
     if (name != null && name.isNotEmpty) {
-      // checks if the name is not null and not empty before saving the score to Hive and navigating to the leaderboard screen
-      await HiveService.addScore(name, score); // saves the user's name and score to Hive using the addScore method from HiveService
+      await HiveService.addScore(name, score);
       if (context.mounted) {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const LeaderboardScreen()));
       }
     } else if (name != null && name.isEmpty) {
-      // shows a snackbar message if the user tries to save their score without entering a name
       ScaffoldMessenger.of(context).showSnackBar(
-        // shows a snackbar message if the user tries to save their score without entering a name
-        const SnackBar(content: Text('Name cannot be empty')), // message displayed in the snackbar when the user tries to save their score without entering a name
+        SnackBar(content: Text(AppConstants.nameCannotBeEmpty)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final unanswered = total - attemptedCount;
+    final wrong = attemptedCount - score;
     return Scaffold(
-      appBar: AppBar(title: const Text('Quiz Completed'), centerTitle: true),
+      appBar: AppBar(title: Text(AppConstants.quizCompleted), centerTitle: true),
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade50, Colors.white],
+            colors: [theme.primaryColor.withOpacity(0.1), Colors.white],
           ),
         ),
-        child: Center(
+        child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.05, horizontal: AppConstants.largePadding),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
-                const SizedBox(height: 20),
+                Icon(Icons.emoji_events, size: 80, color: theme.primaryColor),
+                const SizedBox(height: AppConstants.largePadding),
                 Text(
-                  'Your Score',
-                  style: TextStyle(fontSize: 28, color: Colors.grey.shade700),
+                  AppConstants.yourScore,
+                  style: theme.textTheme.headlineSmall?.copyWith(color: Colors.grey.shade700),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppConstants.smallPadding),
                 Text(
-                  '$score / $total', // displays the user's score and total questions in a large font
-                  style: const TextStyle(fontSize: 52, fontWeight: FontWeight.bold, color: Colors.blue),
+                  '$score / $total',
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
+                    fontSize: AppConstants.resultScoreFontSize,
+                  ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: AppConstants.largePadding),
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppConstants.defaultPadding),
+                    child: Column(
+                      children: [
+                        _buildRow(AppConstants.attemptedLabel, '$attemptedCount / $total', theme.primaryColor, theme),
+                        const Divider(),
+                        _buildRow(AppConstants.unansweredLabel, '$unanswered / $total', AppConstants.warningColor, theme),
+                        const Divider(),
+                        _buildRow(AppConstants.correctLabel, '$score', AppConstants.correctColor, theme),
+                        const Divider(),
+                        _buildRow(AppConstants.wrongLabel, '$wrong', AppConstants.wrongColor, theme),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppConstants.largePadding * 2),
                 ElevatedButton.icon(
-                  onPressed: () => _saveAndShowLeaderboard(context), // calls the _saveAndShowLeaderboard method when the user presses the button to save their score and view the leaderboard
+                  onPressed: () => _saveAndShowLeaderboard(context),
                   icon: const Icon(Icons.leaderboard),
-                  label: const Text('SAVE & LEADERBOARD'), // label for the button that saves the user's score and navigates to the leaderboard screen
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 56)),
+                  label: Text(AppConstants.saveAndLeaderboard),
+                  style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, AppConstants.buttonHeight)),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.defaultPadding),
                 OutlinedButton.icon(
-                  // button that allows the user to retry the quiz by navigating back to the quiz screen
                   onPressed: () {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const QuizScreen()));
                   },
                   icon: const Icon(Icons.refresh),
-                  label: const Text('RETRY QUIZ'), // label for the button that allows the user to retry the quiz
-                  style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 56)),
+                  label: Text(AppConstants.retryQuiz),
+                  style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, AppConstants.buttonHeight)),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRow(String label, String value, Color color, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppConstants.smallPadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: theme.textTheme.bodyMedium),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

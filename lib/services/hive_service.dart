@@ -4,12 +4,11 @@ class HiveService {
   static late Box _scoresBox;
 
   static Future<void> init() async {
-    _scoresBox = await Hive.openBox('scores'); // creates/opens a box named 'scores' and assigns it to the static variable _scoresBox &
-    // and then returns back to main.dart after initialization is complete
+    _scoresBox = await Hive.openBox('scores');
   }
 
   static Future<void> addScore(String name, int score) async {
-    final id = DateTime.now().millisecondsSinceEpoch.toString(); // now a string
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
     await _scoresBox.put(id, {'name': name, 'score': score});
   }
 

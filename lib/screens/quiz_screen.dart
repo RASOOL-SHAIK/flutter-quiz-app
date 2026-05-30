@@ -1,11 +1,79 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../constants.dart';
 import '../services/quiz_data_service.dart';
 import '../services/sound_service.dart';
 import '../models/question.dart';
 import 'result_screen.dart';
 import 'settings_screen.dart';
 
+// Timer bar widget – rebuilds only itself every second
+class _TimerBar extends StatefulWidget {
+  final VoidCallback onTimeout;
+  const _TimerBar({super.key, required this.onTimeout});
+
+  @override
+  State<_TimerBar> createState() => _TimerBarState();
+}
+
+class _TimerBarState extends State<_TimerBar> {
+  int _timeLeft = AppConstants.defaultTimerSeconds;
+  Timer? _timer;
+  bool _isActive = true;
+
+  void startTimer() {
+    _timer?.cancel();
+    _timeLeft = AppConstants.defaultTimerSeconds;
+    _isActive = true;
+    _timer = Timer.periodic(AppConstants.timerInterval, (timer) {
+      if (_timeLeft <= 1) {
+        timer.cancel();
+        if (_isActive) widget.onTimeout();
+      } else {
+        setState(() => _timeLeft--);
+      }
+    });
+  }
+
+  void stopTimer() {
+    _isActive = false;
+    _timer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final timerProgress = _timeLeft / AppConstants.defaultTimerSeconds;
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(Icons.timer, color: theme.primaryColor, size: AppConstants.timerIconSize),
+        const SizedBox(width: AppConstants.smallPadding),
+        Expanded(
+          child: LinearProgressIndicator(
+            value: timerProgress,
+            backgroundColor: Colors.grey.shade300,
+            color: timerProgress > 0.3 ? AppConstants.warningColor : AppConstants.timerWarningColor,
+            borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius / 2),
+            minHeight: AppConstants.progressBarHeight,
+          ),
+        ),
+        const SizedBox(width: AppConstants.smallPadding),
+        Text(
+          '$_timeLeft ${AppConstants.secondsUnit}',
+          style: TextStyle(fontWeight: FontWeight.bold, color: theme.primaryColor),
+        ),
+      ],
+    );
+  }
+}
+
+// Main Quiz Screen
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
 
@@ -17,89 +85,71 @@ class _QuizScreenState extends State<QuizScreen> {
   List<Question> _roundQuestions = [];
   int _currentIndex = 0;
   int _score = 0;
+  int _attemptedCount = 0;
   int? _selectedAnswerIndex;
-  Timer? _timer;
-  int _timeLeft = 30;
   bool _isAnswered = false;
+  final GlobalKey<_TimerBarState> _timerBarKey = GlobalKey<_TimerBarState>();
 
   @override
   void initState() {
     super.initState();
-    _loadQuestions(); // calls the function to load questions from the quiz data service and starts the quiz
+    _loadQuestions();
   }
 
   Future<void> _loadQuestions() async {
     final all = await QuizDataService.loadQuestions();
     setState(() {
-      _roundQuestions = QuizDataService.getRandomQuestions(all, 10); // gets 10 random questions from the loaded questions and sets it to the state variable _roundQuestions
-      _startTimer(); // starts the timer for the first question
+      _roundQuestions = QuizDataService.getRandomQuestions(all, 10);
     });
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    _timeLeft = 30;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      // starts a periodic timer that ticks every second and updates the time left for the current question
-      if (_timeLeft <= 1) {
-        timer.cancel();
-        if (!_isAnswered) _nextQuestion(autoTimeOut: true);
-      } else {
-        setState(() => _timeLeft--);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _timerBarKey.currentState?.startTimer();
     });
   }
 
   void _checkAnswer(int selectedIdx) {
-    // checks the selected answer index against the correct answer for the current question and updates the score and state accordingly
     if (_isAnswered) return;
     setState(() {
       _isAnswered = true;
       _selectedAnswerIndex = selectedIdx;
+      _attemptedCount++;
       final isCorrect = _roundQuestions[_currentIndex].answers[selectedIdx] == _roundQuestions[_currentIndex].correctAnswer;
       if (isCorrect) {
-        _score++; // increment score if the answer is correct
-        SoundService.playCorrect(); // play correct sound if the answer is correct
+        _score++;
+        SoundService.playCorrect();
       } else {
-        // play wrong sound if the answer is incorrect
         SoundService.playWrong();
       }
-      _timer?.cancel(); // stop the timer when the user has answered
-      Future.delayed(const Duration(milliseconds: 800), () => _nextQuestion()); // wait for 800 milliseconds before moving to the next question to show the correct/wrong feedback
+      _timerBarKey.currentState?.stopTimer();
+      Future.delayed(AppConstants.answerFeedbackDelay, () => _nextQuestion());
     });
   }
 
-  void _nextQuestion({bool autoTimeOut = false}) {
-    // moves to the next question or ends the quiz if it was the last question, also handles the case when time runs out for a question
+  void _nextQuestion() {
     if (_currentIndex + 1 < _roundQuestions.length) {
-      // if there are more questions left, move to the next question
       setState(() {
-        // update the state to move to the next question
-        _currentIndex++; // increment the current index to move to the next question
-        _selectedAnswerIndex = null; // reset selected answer
-        _isAnswered = false; // reset answered state
-        _startTimer(); // again restart timer for next question
+        _currentIndex++;
+        _selectedAnswerIndex = null;
+        _isAnswered = false;
       });
+      _timerBarKey.currentState?.startTimer();
     } else {
-      // quiz end
-      _timer?.cancel(); // stop timer if still running
+      _timerBarKey.currentState?.stopTimer();
       Navigator.pushReplacement(
-          // navigate to result screen and pass score & push replacement means user can't go back to quiz screen
-          context,
-          MaterialPageRoute(
-              // materialpageroute means ? what ? it is used to navigate to another screen with material design transition
-              // why builder ? what is builder ? simply it is a function that returns a widget and it is used to build the widget tree for the new screen
-              builder: (_) => ResultScreen(
-                  // result screen is a stateless widget that shows the final score and some message based on the score
-                  score: _score,
-                  total: _roundQuestions.length)));
-      // this line - redirects to ResultScreen in lib/screens/result_screen.dart and passes the score and total number of questions as arguments to the result screen to show the final score and message based on the score
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(
+            score: _score,
+            total: _roundQuestions.length,
+            attemptedCount: _attemptedCount,
+          ),
+        ),
+      );
     }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _timerBarKey.currentState?.stopTimer();
     super.dispose();
   }
 
@@ -109,17 +159,16 @@ class _QuizScreenState extends State<QuizScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final q = _roundQuestions[_currentIndex];
-    final timerProgress = _timeLeft / 30;
+    final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quiz Challenge'),
+        title: Text(AppConstants.appTitle),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-            },
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
           ),
         ],
       ),
@@ -133,91 +182,75 @@ class _QuizScreenState extends State<QuizScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(screenWidth * 0.04),
             child: Column(
               children: [
-                // Question progress bar (teal)
                 LinearProgressIndicator(
                   value: (_currentIndex + 1) / _roundQuestions.length,
                   backgroundColor: Colors.grey.shade300,
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(10),
-                  minHeight: 8,
+                  color: theme.primaryColor,
+                  borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius / 2),
+                  minHeight: AppConstants.progressBarHeight,
                 ),
-                const SizedBox(height: 12),
-                // Timer bar with icon (amber / deep orange)
-                Row(
-                  children: [
-                    const Icon(Icons.timer, color: Colors.deepOrange),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: LinearProgressIndicator(
-                        value: timerProgress,
-                        backgroundColor: Colors.grey.shade300,
-                        color: timerProgress > 0.3 ? Colors.amber.shade700 : Colors.deepOrange,
-                        borderRadius: BorderRadius.circular(8),
-                        minHeight: 8,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '$_timeLeft sec',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Question text
+                const SizedBox(height: AppConstants.smallPadding),
+                _TimerBar(key: _timerBarKey, onTimeout: _nextQuestion),
+                const SizedBox(height: AppConstants.defaultPadding * 2),
                 Text(
                   q.text,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontSize: AppConstants.questionFontSize,
+                    fontWeight: FontWeight.w600,
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
-                // Options as beautiful cards with correct/wrong highlighting
+                const SizedBox(height: AppConstants.largePadding * 2),
                 ...List.generate(q.answers.length, (idx) {
                   Color? cardColor = Colors.white;
                   Color borderColor = Colors.grey.shade300;
                   Color textColor = Colors.black87;
                   if (_isAnswered && idx == _selectedAnswerIndex) {
                     final isUserCorrect = q.answers[idx] == q.correctAnswer;
-                    cardColor = isUserCorrect ? Colors.green.shade50 : Colors.red.shade50;
-                    borderColor = isUserCorrect ? Colors.green : Colors.red;
-                    textColor = isUserCorrect ? Colors.green.shade800 : Colors.red.shade800;
+                    cardColor = isUserCorrect ? AppConstants.correctColor.withOpacity(0.1) : AppConstants.wrongColor.withOpacity(0.1);
+                    borderColor = isUserCorrect ? AppConstants.correctColor : AppConstants.wrongColor;
+                    textColor = isUserCorrect ? AppConstants.correctColor.shade800 : AppConstants.wrongColor.shade800;
                   } else if (_isAnswered && q.answers[idx] == q.correctAnswer) {
-                    cardColor = Colors.green.shade50;
-                    borderColor = Colors.green;
-                    textColor = Colors.green.shade800;
+                    cardColor = AppConstants.correctColor.withOpacity(0.1);
+                    borderColor = AppConstants.correctColor;
+                    textColor = AppConstants.correctColor.shade800;
                   }
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: AppConstants.smallPadding),
                     child: Material(
                       elevation: 2,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
                       color: cardColor,
                       child: InkWell(
                         onTap: _isAnswered ? null : () => _checkAnswer(idx),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: borderColor, width: 1.5),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
                           ),
                           child: ListTile(
                             leading: _isAnswered
                                 ? Icon(
                                     q.answers[idx] == q.correctAnswer ? Icons.check_circle : (idx == _selectedAnswerIndex ? Icons.cancel : Icons.radio_button_unchecked),
-                                    color: q.answers[idx] == q.correctAnswer ? Colors.green : (idx == _selectedAnswerIndex ? Colors.red : Colors.grey),
+                                    color: q.answers[idx] == q.correctAnswer ? AppConstants.correctColor : (idx == _selectedAnswerIndex ? AppConstants.wrongColor : Colors.grey),
                                   )
                                 : Radio<int>(
                                     value: idx,
                                     groupValue: _selectedAnswerIndex,
                                     onChanged: (value) => _checkAnswer(value!),
-                                    activeColor: Colors.blue,
+                                    activeColor: theme.primaryColor,
                                   ),
                             title: Text(
                               q.answers[idx],
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor),
+                              style: TextStyle(
+                                fontSize: AppConstants.optionFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: textColor,
+                              ),
                             ),
                           ),
                         ),
@@ -226,21 +259,20 @@ class _QuizScreenState extends State<QuizScreen> {
                   );
                 }),
                 const Spacer(),
-                // Stylish Next button
                 ElevatedButton(
                   onPressed: _isAnswered ? _nextQuestion : null,
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 56),
-                    backgroundColor: _isAnswered ? Colors.teal : Colors.grey.shade400,
+                    minimumSize: Size(screenWidth * 0.8, AppConstants.buttonHeight),
+                    backgroundColor: _isAnswered ? theme.primaryColor : Colors.grey.shade400,
                     foregroundColor: Colors.white,
                     elevation: 6,
                   ),
-                  child: const Text(
-                    'NEXT QUESTION ➡',
-                    style: TextStyle(fontSize: 18, letterSpacing: 1.2),
+                  child: Text(
+                    AppConstants.nextQuestion,
+                    style: const TextStyle(fontSize: AppConstants.buttonFontSize, letterSpacing: 1.2),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.defaultPadding),
               ],
             ),
           ),

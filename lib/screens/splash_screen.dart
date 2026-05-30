@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants.dart';
 import 'quiz_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,46 +12,55 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // called when the splash screen is first created, used to perform initialization tasks
-    super.initState(); // calls the parent class's initState
-    Future.delayed(const Duration(seconds: 4), () {
-      // waits for 4 seconds before executing the function
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const QuizScreen())); // calls quiz screen and replaces the splash screen in the navigation stack
+    super.initState();
+    Future.delayed(AppConstants.splashDuration, () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const QuizScreen()),
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.blue.shade700, Colors.purple.shade500],
+            colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.7)],
           ),
         ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const FlutterLogo(size: 100),
-              const SizedBox(height: 20),
-              const Text(
-                'Quiz Challenge',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
+              FlutterLogo(size: AppConstants.splashLogoSize),
+              const SizedBox(height: AppConstants.largePadding),
               Text(
-                'Powered by Aapthi Technologies',
-                style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.9)),
+                AppConstants.appTitle,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppConstants.smallPadding),
               Text(
-                'Designed by Rasool Shaik',
-                style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.7)),
+                AppConstants.presentedBy,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withOpacity(0.9),
+                ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: AppConstants.extraSmallPadding),
+              Text(
+                AppConstants.designedBy,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.white.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: AppConstants.defaultPadding * 2),
               const CircularProgressIndicator(color: Colors.white),
             ],
           ),

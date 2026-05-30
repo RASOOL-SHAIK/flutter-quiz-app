@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../constants.dart';
 import '../services/hive_service.dart';
 
 class LeaderboardScreen extends StatefulWidget {
-  const LeaderboardScreen({super.key}); // this line - defines the constructor for the LeaderboardScreen widget, which is a StatefulWidget that displays the leaderboard of top scores saved in Hive.
+  const LeaderboardScreen({super.key});
 
   @override
-  State<LeaderboardScreen> createState() => _LeaderboardScreenState(); // this line - creates the mutable state for the LeaderboardScreen widget by returning an instance of _LeaderboardScreenState, which is defined below and contains the logic for loading and displaying the scores from Hive.
+  State<LeaderboardScreen> createState() => _LeaderboardScreenState();
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
@@ -18,25 +19,25 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Future<void> _loadScores() async {
-    // this method - loads the top scores from Hive using the HiveService and updates the state to display them in the UI
-    final scores = await HiveService.getTopScores(); // retrieves the top scores from Hive using the getTopScores method from HiveService, which returns a list of maps containing the name and score of each entry
-    setState(() => _scores = scores); // updates the state of the widget by setting the _scores variable to the list of scores retrieved from Hive, which triggers a rebuild of the UI to display the updated leaderboard
+    final scores = await HiveService.getTopScores();
+    setState(() => _scores = scores);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Leaderboard', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppConstants.leaderboardTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        elevation: 0,
+        elevation: AppConstants.appBarElevation,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade50, Colors.white],
+            colors: [theme.primaryColor.withOpacity(0.1), Colors.white],
           ),
         ),
         child: _scores.isEmpty
@@ -45,13 +46,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.leaderboard, size: 80, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('No scores yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                    SizedBox(height: AppConstants.defaultPadding),
+                    Text(AppConstants.noScoresYet, style: TextStyle(fontSize: 18, color: Colors.grey)),
                   ],
                 ),
               )
             : ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppConstants.defaultPadding),
                 itemCount: _scores.length,
                 itemBuilder: (ctx, i) {
                   final rank = i + 1;
@@ -63,11 +64,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   else if (rank == 3)
                     rankColor = Colors.brown.shade400;
                   else
-                    rankColor = Colors.blue.shade300;
+                    rankColor = theme.primaryColor.withOpacity(0.7);
                   return Card(
                     elevation: 4,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    margin: const EdgeInsets.only(bottom: AppConstants.smallPadding),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: rankColor,
@@ -75,18 +76,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                       title: Text(
                         _scores[i]['name'],
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                        style: theme.textTheme.titleMedium,
                         textAlign: TextAlign.center,
                       ),
                       trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: AppConstants.smallPadding, vertical: AppConstants.extraSmallPadding),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(20),
+                          color: theme.primaryColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
                         ),
                         child: Text(
-                          '${_scores[i]['score']} pts',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          '${_scores[i]['score']} ${AppConstants.pointsUnit}',
+                          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
