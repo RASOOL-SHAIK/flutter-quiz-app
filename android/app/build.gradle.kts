@@ -5,8 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.quiz_app"
-    compileSdk = 35  // changed from 36 to 35 (requires Android SDK Platform 35)
-    // ndkVersion line removed – not needed
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -15,8 +14,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.quiz_app"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 35  // changed from 34 to 35
+        minSdk = 21
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -25,12 +24,6 @@ android {
         release {
             signingConfig = signingConfigs.getByName("debug")
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
