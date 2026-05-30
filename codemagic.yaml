@@ -10,9 +10,6 @@ workflows:
     scripts:
       - flutter clean
       - flutter pub get
-      - cd android
-      - ./gradlew clean
-      - cd ..
       - flutter build apk --debug
     artifacts:
       - build/**/outputs/flutter-apk/*.apk
