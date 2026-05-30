@@ -1,7 +1,19 @@
 workflows:
   default:
     name: Default Workflow
+    environment:
+      flutter: stable
+      java: 17
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
     scripts:
+      - flutter clean
+      - flutter pub get
+      - cd android
+      - chmod +x gradlew
+      - ./gradlew clean
+      - cd ..
       - flutter build apk --debug
     artifacts:
       - build/**/outputs/flutter-apk/*.apk

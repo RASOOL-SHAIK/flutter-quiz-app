@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.quiz_app"
-    compileSdk = 36  // increased to 36
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.example.quiz_app"
         minSdk = 21
-        targetSdk = 36  // also set to 36
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
     }
